@@ -25,7 +25,7 @@ void makeFiles(struct Room * holder [])
 	char file [200];
 	for(i=0; i<20; i++)
 	{
-		file[i]=buffer[i-1];	
+		file[i]=buffer[i];	
 	}
 	file[20]='/';
 	FILE * fp;
@@ -39,6 +39,7 @@ void makeFiles(struct Room * holder [])
 		{
 			temp[i] = source[i-21];	
 		}
+		printf("%s\n",temp);
 		fp=fopen(temp,"w");
 		fclose(fp);
 	}
