@@ -43,7 +43,7 @@ void makeFiles(struct Room * holder [])
 		fp=fopen(temp,"w");
 		if(fp == NULL)
 		{
-			printf("file messed up");
+			printf("file messed up\n");
 			exit(1);
 		}
 		fprintf(fp,"ROOM NAME: %s\n",holder[c]->name);
