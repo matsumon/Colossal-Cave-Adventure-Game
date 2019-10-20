@@ -17,7 +17,7 @@ struct Room
 
 void makeFiles(struct Room * holder [])
 {
-	int i,c;
+	int i,c,d;
 	int pid = getpid();
 	char buffer [100];
 	sprintf(buffer,"matsumon.rooms.%d",pid);	
@@ -46,7 +46,13 @@ void makeFiles(struct Room * holder [])
 			printf("file messed up");
 			exit(1);
 		}
-		fprintf(fp,"Room Name: %s\n",holder[c]->name);
+		fprintf(fp,"ROOM NAME: %s\n",holder[c]->name);
+		for(d=0; d<holder[c]->num_connections; d++)
+		{
+			fprintf(fp,"CONNECTION %d: %s\n",d+1,
+			holder[c]->connections[d]);
+		}
+		fprintf(fp,"ROOM TYPE: %s\n", holder[c]->room_type);
 		fclose(fp);
 	}
 }
