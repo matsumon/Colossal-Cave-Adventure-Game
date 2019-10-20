@@ -39,7 +39,6 @@ void makeFiles(struct Room * holder [])
 		{
 			temp[i] = source[i-21];	
 		}
-		printf("%s\n",temp);
 		fp=fopen(temp,"w");
 		if(fp == NULL)
 		{
@@ -188,18 +187,18 @@ int main()
 	for(i=0;i<7;i++)
 	{
 		holder[i] = assign_Name(random_names,holder,i);
-		printf("%s\n",holder[i]->name);
+	//	printf("%s\n",holder[i]->name);
 	}
 	assign_room_type(holder);
 	assign_connections(holder);
-	for(i=0;i<7;i++)
+/*	for(i=0;i<7;i++)
 	{
 		printf("%d",i);
 		for(c=0; c<holder[i]->num_connections; c++)
 		{
 			printf("%s\n",holder[i]->connections[c]);
 		}
-	}
+	}*/
 	makeFiles(holder);
 
 	for(i=0;i<7;i++)
