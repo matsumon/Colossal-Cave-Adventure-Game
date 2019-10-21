@@ -17,17 +17,34 @@ struct Room
 
 void makeFiles(struct Room * holder [])
 {
-	int i,c,d;
+	int i,c,d,t;
 	int pid = getpid();
 	char buffer [100];
 	sprintf(buffer,"matsumon.rooms.%d",pid);	
 	mkdir(buffer,0700);
 	char file [200];
+	for(i=0; i<200; i++)
+	{
+		file[i]='\0';
+	}
 	for(i=0; i<20; i++)
 	{
 		file[i]=buffer[i];	
 	}
-	file[20]='/';
+	t=0;
+	for(i=0; i < 200; i++)
+	{
+		if(file[i] != '\0')
+		{
+			t++;	
+		}	
+		else
+		{
+			break;
+		}
+	}
+	file[t]='/';
+	t++;
 	FILE * fp;
 	for(c = 0; c < 7; c++)
 	{
@@ -35,9 +52,9 @@ void makeFiles(struct Room * holder [])
 		char temp[100]="";
 		memcpy(source, holder[c]->name, strlen(holder[c]->name));
 		memcpy(temp, file, strlen(file));
-		for(i=21; i<21+strlen(holder[c]->name); i++)
+		for(i=t; i<t+strlen(holder[c]->name); i++)
 		{
-			temp[i] = source[i-21];	
+			temp[i] = source[i-t];	
 		}
 		fp=fopen(temp,"w");
 		if(fp == NULL)
