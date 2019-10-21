@@ -20,7 +20,10 @@ void find_room_files (char file_paths[7][200], char * dir_path)
 	FILE * fp;
 	struct dirent *entry;
 	char * room_files [7];
-	dir = opendir(dir_path);
+	char temp_path[100];
+	strcpy(temp_path,dir_path);	
+	printf("%s",temp_path);
+	dir = opendir(temp_path);
 	if(dir == NULL)
 	{
 		printf("couldnt open anythingi");
@@ -164,7 +167,12 @@ char * find_recent_dir()
 		}	
 	}
 	printf("%d\n",most_recent_index);
-	return(relevant_dir[most_recent_index]);
+	int length = strlen(relevant_dir[most_recent_index]);
+	char * temptr ;
+	temptr= (char *)malloc(length*sizeof(char));
+	strcpy(temptr,relevant_dir[most_recent_index]);
+	return temptr;	
+	//return(relevant_dir[most_recent_index]);
 }
 
 int main()
@@ -186,4 +194,5 @@ int main()
 		printf("\n");
 
 	}
+	free(dir);
 }
