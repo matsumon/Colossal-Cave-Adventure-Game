@@ -22,31 +22,25 @@ void find_room_files (char file_paths[7][200], char * dir_path)
 	char * room_files [7];
 	char temp_path[100];
 	strcpy(temp_path,dir_path);	
-	printf("%s",temp_path);
 	dir = opendir(temp_path);
 	if(dir == NULL)
 	{
-		printf("couldnt open anythingi");
 		exit(1);
 	}
-	printf("dir path before %s\n",dir_path);
 	while(entry=readdir(dir))
 	{
-	printf("dir path in while %s\n",dir_path);
 		if(entry->d_type == 8)
 		{
 			room_files[i] = entry->d_name;
 			i++;
 		}
 	}
-	printf("dir path after while%s\n",dir_path);
 	for(i = 0; i < 7; i++)
 	{
 		//	printf("%s\n", room_files[i]);
 	}
 	closedir(dir);
 	char folder_path [200];	
-	printf("strlen %d\n",strlen(dir_path));
 	for(q = 0; q < 7; q++)
 	{
 		for(i =0; i < strlen(dir_path); i++)
@@ -166,7 +160,7 @@ char * find_recent_dir()
 		 most_recent_index = i;
 		}	
 	}
-	printf("%d\n",most_recent_index);
+//	printf("%d\n",most_recent_index);
 	int length = strlen(relevant_dir[most_recent_index]);
 	char * temptr ;
 	temptr= (char *)malloc(length*sizeof(char));
@@ -178,6 +172,7 @@ char * find_recent_dir()
 int main()
 {
 	int i,q;
+	struct Room holder[7];
 	char file_paths [7][200];
 	char * dir=find_recent_dir();
 	find_room_files(file_paths,dir);
@@ -193,6 +188,58 @@ int main()
 		}
 		printf("\n");
 
+	}
+	char room_name[]="ROOM NAME:";
+	char room_connection[]="CONNECTION ";
+	char room_type[] ="ROOM TYPE: ";
+	for(i =0; i<7; i++)
+	{
+		FILE * fp;
+		char * buffer;
+		size_t buffsize = 80;
+		fp = fopen(file_paths[i],"r");
+		int c = 0;
+		while(!feof(fp))
+		{
+			getline(&buffer,&buffsize,fp);
+			printf("buffer\n%s",buffer);
+			if(strstr(buffer,room_name) != NULL)
+			{
+				char * temp = buffer+11;
+				char * green=(char*)malloc(50*sizeof(char));
+				strcpy(green,temp);
+				printf("green %s",green);
+				holder[i].name = green;
+				printf("%s",holder[i].name);
+			}
+			else if(strstr(buffer,room_connection)!= NULL)
+			{
+				char * temp=(char*)malloc(50*sizeof(char));
+				strcpy(temp, buffer+14);
+				holder[i].connections[c]=temp;
+				c++;
+			}
+			else if(strstr(buffer,room_type) != NULL)
+			{
+				char * temp=(char*)malloc(50*sizeof(char));
+
+				strcpy(temp, buffer+11);
+				holder[i].room_type=temp;
+			}
+		}
+		holder[i].num_connections=c;
+		fclose(fp);
+	}
+	int c;
+	for(i=0;i<7;i++)
+	{
+			printf("name %s\n",holder[i].name);
+		for(c=0; c<holder[i].num_connections; c++)
+		{
+			printf("%s\n",holder[i].connections[c]);
+		}
+			printf("type %s\n",holder[i].room_type);
+			printf("num %d\n",holder[i].num_connections);
 	}
 	free(dir);
 }
