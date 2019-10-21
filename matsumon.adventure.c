@@ -12,7 +12,7 @@ struct Room
 	char * room_type;
 };
 
-void find_room_files (char file_paths[7][200],char * dir_path)
+void find_room_files (char file_paths[7][200], char * dir_path)
 {
 	DIR * dir;
 	int i =0;
@@ -20,30 +20,30 @@ void find_room_files (char file_paths[7][200],char * dir_path)
 	FILE * fp;
 	struct dirent *entry;
 	char * room_files [7];
-//	char * dir_path = "matsumon.rooms.19860";
-//	char file_paths [7][200];
 	dir = opendir(dir_path);
 	if(dir == NULL)
 	{
 		printf("couldnt open anythingi");
 		exit(1);
 	}
+	printf("dir path before %s\n",dir_path);
 	while(entry=readdir(dir))
 	{
-		//printf("%d\n",entry->d_type);
+	printf("dir path in while %s\n",dir_path);
 		if(entry->d_type == 8)
 		{
 			room_files[i] = entry->d_name;
 			i++;
 		}
-		//	printf("%s\n", entry->d_name);
 	}
+	printf("dir path after while%s\n",dir_path);
 	for(i = 0; i < 7; i++)
 	{
 		//	printf("%s\n", room_files[i]);
 	}
 	closedir(dir);
 	char folder_path [200];	
+	printf("strlen %d\n",strlen(dir_path));
 	for(q = 0; q < 7; q++)
 	{
 		for(i =0; i < strlen(dir_path); i++)
@@ -134,7 +134,7 @@ char * find_recent_dir()
 //	printf("\n");
 	for(i = 0; i < s; i++)
 	{
-		printf("%s\n",relevant_dir[i]);
+		//printf("%s\n",relevant_dir[i]);
 	}
 	int time_holder [s];
 	for(i =0; i < s; i++)
@@ -153,7 +153,7 @@ char * find_recent_dir()
 	}
 	for(i =0; i < s; i++)
 	{
-		printf("%d\n",time_holder[i]);
+//		printf("%d\n",time_holder[i]);
 	}
 	int most_recent_index= 0;
 	for(i = 1; i <s; i++)
@@ -181,9 +181,9 @@ int main()
 			{
 				break;
 			}
-				printf("%c",file_paths[i][q]);
+			printf("%c",file_paths[i][q]);
 		}
-			printf("\n");
+		printf("\n");
 
 	}
 }
