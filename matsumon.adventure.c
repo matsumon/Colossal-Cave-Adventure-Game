@@ -11,6 +11,15 @@ struct Room
 	int num_connections;
 	char * room_type;
 };
+void get_input(struct Room holder[7],char * victory[1000],int current,int steps)
+{
+	printf("here");
+	int read_n = 100;
+	char user_input [read_n];
+	fgets(user_input, read_n,stdin);
+	printf("user %s", user_input);
+	
+}
 
 void find_room_files (char file_paths[7][200], char * dir_path)
 {
@@ -168,6 +177,60 @@ char * find_recent_dir()
 	return temptr;	
 	//return(relevant_dir[most_recent_index]);
 }
+void play_game(struct Room holder[7])
+{
+	int i,c, current;	
+	char * start = "START_ROOM\n";
+	char * end = "END_ROOM\n";
+	char * victory[1000];
+	int steps =0;
+	int start_index, end_index;
+	for(i=0;i<7;i++)
+	{
+		printf("IIII %d\n",i);
+		printf("name %s\n",holder[i].name);
+		for(c=0; c<holder[i].num_connections; c++)
+		{
+		printf("Cccc %d\n",c);
+			printf("%s\n",holder[i].connections[c]);
+		}
+		printf("type %s\n",holder[i].room_type);
+		printf("num %d\n",holder[i].num_connections);
+	}
+	for(i =0; i < 7; i++)
+	{
+		if(strcmp(holder[i].room_type, start)== 0)
+		{
+			start_index = i;
+			current = start_index;
+		}
+		else if(strcmp(holder[i].room_type, end)== 0)
+		{
+			end_index = i;
+		}
+	}	
+	while(current != end_index)
+	{
+		printf("CURRENT LOCATION: %s",holder[current].name);
+		printf("POSSIBLE CONNECTIONS: ");
+		for(i=0;i<holder[current].num_connections - 1;i++)
+		{
+			char temp [15];
+			strcpy(temp, holder[current].connections[i]);
+			temp[strlen(holder[current].connections[i])-1]='\0';
+			printf("%s, ",temp);
+		}
+		char temp [15];
+		int num = holder[current].num_connections - 1;
+		strcpy(temp, holder[current].connections[num]);
+		temp[strlen(holder[current].connections[num])-1]='\0';
+		printf("%s.\n",temp);
+		printf("WHERE TO? >");
+//		get_input(holder,victory,current,steps);
+		exit(1);
+	}
+
+}
 
 int main()
 {
@@ -176,19 +239,19 @@ int main()
 	char file_paths [7][200];
 	char * dir=find_recent_dir();
 	find_room_files(file_paths,dir);
-	for(i = 0; i < 7; i++)
-	{
+	/*	for(i = 0; i < 7; i++)
+		{
 		for(q=0; q < 200; q++)
 		{
-			if(file_paths[i][q] == '\0')
-			{
-				break;
-			}
-			printf("%c",file_paths[i][q]);
+		if(file_paths[i][q] == '\0')
+		{
+		break;
+		}
+		printf("%c",file_paths[i][q]);
 		}
 		printf("\n");
 
-	}
+		}*/
 	char room_name[]="ROOM NAME:";
 	char room_connection[]="CONNECTION ";
 	char room_type[] ="ROOM TYPE: ";
@@ -202,15 +265,15 @@ int main()
 		while(!feof(fp))
 		{
 			getline(&buffer,&buffsize,fp);
-			printf("buffer\n%s",buffer);
+			//	printf("buffer\n%s",buffer);
 			if(strstr(buffer,room_name) != NULL)
 			{
 				char * temp = buffer+11;
 				char * green=(char*)malloc(50*sizeof(char));
 				strcpy(green,temp);
-				printf("green %s",green);
+				//		printf("green %s",green);
 				holder[i].name = green;
-				printf("%s",holder[i].name);
+				//		printf("%s",holder[i].name);
 			}
 			else if(strstr(buffer,room_connection)!= NULL)
 			{
@@ -231,15 +294,6 @@ int main()
 		fclose(fp);
 	}
 	int c;
-	for(i=0;i<7;i++)
-	{
-			printf("name %s\n",holder[i].name);
-		for(c=0; c<holder[i].num_connections; c++)
-		{
-			printf("%s\n",holder[i].connections[c]);
-		}
-			printf("type %s\n",holder[i].room_type);
-			printf("num %d\n",holder[i].num_connections);
-	}
+	play_game(holder);
 	free(dir);
 }
