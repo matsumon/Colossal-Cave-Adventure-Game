@@ -11,13 +11,39 @@ struct Room
 	int num_connections;
 	char * room_type;
 };
+int find_current(struct Room holder[7],char * name )
+{
+	int i;
+	for(i = 0; i < 7; i++)
+	{
+		if(strcmp(holder[i].name,name) == 0)
+		{
+			return i;
+		}
+	}	
+}
 void get_input(struct Room holder[7],char * victory[1000],int current,int steps)
 {
-	printf("here");
 	int read_n = 100;
 	char user_input [read_n];
-	fgets(user_input, read_n,stdin);
-	printf("user %s", user_input);
+	fflush(stdin);
+	fgets(user_input,read_n,stdin);
+	int i,check = 0;
+	for(i =0; i <holder[current].num_connections; i++)
+	{
+		if(strcmp(holder[current].connections[i],user_input) ==0)
+		{
+			check = 1;
+			victory[steps] = holder[current].connections[i];
+			steps++;
+			current = find_current(holder,holder[current].connections[i]);
+			printf("%d currrent",current);
+		}
+	}
+	if(check == 0)
+	{
+		printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
+	}
 	
 }
 
@@ -226,8 +252,7 @@ void play_game(struct Room holder[7])
 		temp[strlen(holder[current].connections[num])-1]='\0';
 		printf("%s.\n",temp);
 		printf("WHERE TO? >");
-//		get_input(holder,victory,current,steps);
-		exit(1);
+		get_input(holder,victory,current,steps);
 	}
 
 }
