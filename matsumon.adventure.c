@@ -12,6 +12,22 @@ struct Room
 	char * room_type;
 };
 
+void writeTime()
+{
+	FILE * atime;
+	char* time_file = "currentTime.txt";
+	atime = fopen(time_file,"w");
+	time_t clock;
+	clock = time(NULL);
+	struct tm tm_clock = *localtime(&clock);
+	int size = 100;
+	char formatTime[size];
+	strftime(formatTime,sizeof(formatTime),"%I:%M%P, %A, %B %d, %G",&tm_clock);
+	fprintf(atime,"%s",formatTime);
+	fclose(atime);
+	
+}
+
 int find_current(struct Room holder[7],char * name )
 {
 	int i;
@@ -284,6 +300,7 @@ int main()
 		fclose(fp);
 	}
 	int c;
+	writeTime();
 	play_game(holder);
 	free(dir);
 	for(i = 0; i< 7; i++)
