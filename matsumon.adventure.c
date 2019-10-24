@@ -11,6 +11,19 @@ struct Room
 	int num_connections;
 	char * room_type;
 };
+void getTime()
+{
+	FILE * fd;
+	fd=fopen("currentTime.txt","r");
+	char * buffer=NULL;
+	size_t buff = 100;
+	if(fd!=NULL)
+	{
+		getline(&buffer,&buff,fd);		
+		printf("%s\n",buffer);
+	}
+	fclose(fd);
+}
 
 void writeTime()
 {
@@ -58,10 +71,17 @@ int get_input(struct Room holder[7],char victory[100][100],int current,int * ste
 	}
 	if(check == 0)
 	{
-		printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
+		if(strcmp(user_input,"time\n")==0)
+		{
+			getTime();
+		}
+		else
+		{
+			printf("\nHUH? I DON'T UNDERSTAND THAT ROOM. TRY AGAIN.\n\n");
+		}
 	}
 	return current;
-	
+
 }
 
 void find_room_files (char file_paths[7][200], char * dir_path)
@@ -141,23 +161,23 @@ char * find_recent_dir()
 	int q;
 	int s =0;
 	char * relevant_dir[t];
-		for(q = 0; q < t; q++)
+	for(q = 0; q < t; q++)
+	{
+		int r = 0;
+		for(i = 0; i < 15; i ++)
 		{
-			int r = 0;
-			for(i = 0; i < 15; i ++)
+			if(dir_holder[q][i] != check[i])
 			{
-				if(dir_holder[q][i] != check[i])
-				{
-					r=1;
-				}
-				
+				r=1;
 			}
-			if( r == 0)
-			{
-				relevant_dir[s] = dir_holder[q];				
-				s++;
-			}
+
 		}
+		if( r == 0)
+		{
+			relevant_dir[s] = dir_holder[q];				
+			s++;
+		}
+	}
 	int time_holder [s];
 	for(i =0; i < s; i++)
 	{
@@ -177,13 +197,13 @@ char * find_recent_dir()
 	{
 	}
 	int most_recent_index= 0;
-		for(i = 1; i <s; i++)
+	for(i = 1; i <s; i++)
+	{
+		if(time_holder[most_recent_index] < time_holder[i])
 		{
-			if(time_holder[most_recent_index] < time_holder[i])
-			{
-				most_recent_index = i;
-			}	
-		}
+			most_recent_index = i;
+		}	
+	}
 	int length = strlen(relevant_dir[most_recent_index]);
 	char * temptr ;
 	temptr= (char *)malloc(length*sizeof(char));
@@ -260,10 +280,11 @@ int main()
 	char room_name[]="ROOM NAME:";
 	char room_connection[]="CONNECTION ";
 	char room_type[] ="ROOM TYPE: ";
+	char * buffer;
+	char * blue;
 	for(i =0; i<7; i++)
 	{
 		FILE * fp;
-		char * buffer;
 		size_t buffsize = 80;
 		fp = fopen(file_paths[i],"r");
 		int c = 0;
@@ -286,19 +307,25 @@ int main()
 				c++;
 				temp = NULL;
 			}
+			else if(feof(fp) == 1)
+			{
+				break;
+			}
+
 			else if(strstr(buffer,room_type) != NULL)
 			{
 				char * temp = buffer+11;
-				char *green=(char*)malloc(50*sizeof(char));
-				strcpy(green, temp);
-				holder[i].room_type=green;
-				green = NULL;
+				blue=(char*)malloc(25*sizeof(char));
+				strcpy(blue, temp);
+				holder[i].room_type=blue;
+				blue = NULL;
 			}
 
 		}
 		holder[i].num_connections=c;
 		fclose(fp);
 	}
+	free(buffer);
 	int c;
 	writeTime();
 	play_game(holder);
@@ -309,7 +336,7 @@ int main()
 		{
 			free(holder[i].connections[c]);
 		}	
-		free(holder[i].name);
 		free(holder[i].room_type);
+		free(holder[i].name);
 	}
 }
