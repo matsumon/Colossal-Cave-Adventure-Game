@@ -21,7 +21,7 @@ void makeFiles(struct Room * holder [])
 	int pid = getpid();
 	char buffer [100];
 	sprintf(buffer,"matsumon.rooms.%d",pid);	
-	mkdir(buffer,0700);
+	mkdir(buffer,0777);
 	char file [200];
 	for(i=0; i<200; i++)
 	{
@@ -57,6 +57,7 @@ void makeFiles(struct Room * holder [])
 			temp[i] = source[i-t];	
 		}
 		fp=fopen(temp,"w");
+		chmod(temp,0777);
 		if(fp == NULL)
 		{
 			printf("file messed up\n");

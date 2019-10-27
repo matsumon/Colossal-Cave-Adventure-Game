@@ -21,6 +21,7 @@ void getTime()
 	pthread_mutex_trylock(&lock);
 	FILE * fd;
 	fd=fopen("currentTime.txt","r");
+	chmod("currentTime.txt",0777);
 	char * buffer=NULL;
 	size_t buff = 100;
 	if(fd!=NULL)
@@ -49,7 +50,10 @@ static void * writeTime(void * attr)
 		formatTime[0]=' ';
 	fprintf(atime,"%s",formatTime);
 	}
-	fprintf(atime," %s",formatTime);
+	else
+	{
+		fprintf(atime," %s",formatTime);
+	}
 	fclose(atime);
 	pthread_mutex_unlock(&lock);
 	return NULL;
@@ -300,16 +304,6 @@ void play_game()
 	char victory[100][100];
 	int steps=0;
 	int start_index, end_index;
-	/*for(i=0;i<7;i++)
-	{
-		//	printf("name %s\n",holder[i].name);
-		for(c=0; c<holder[i].num_connections; c++)
-		{
-			//		printf("%s\n",holder[i].connections[c]);
-		}
-		//	printf("type %s\n",holder[i].room_type);
-		//	printf("num %d\n",holder[i].num_connections);
-	}*/
 	for(i =0; i < 7; i++)
 	{
 		if(strcmp(holder[i].room_type, start)== 0)
@@ -362,20 +356,5 @@ void play_game()
 
 int main(void)
 {
-	/*pthread_t timeClock;
-	  const pthread_attr_t* attr = NULL;
-	  void * args = NULL;
-	  int threadOne =  pthread_create(&timeClock,
-	  NULL,
-	  writeTime,
-	  args);		
-	  pthread_t mainGame;
-	  void * gameArgs = NULL;	*/		
-	/*	int threadTwo = pthread_create(&mainGame,
-		NULL,
-		play_game,
-		(void *)gameArgs);*/
-
-	//	writeTime();
-	play_game();
+		play_game();
 }
