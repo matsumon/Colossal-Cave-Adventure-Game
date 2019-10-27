@@ -4,6 +4,10 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <pthread.h>
+
+pthread_mutex_t lock;
+
 struct Room 
 {
 	char * name;
@@ -11,8 +15,10 @@ struct Room
 	int num_connections;
 	char * room_type;
 };
+
 void getTime()
 {
+	pthread_mutex_trylock(&lock);
 	FILE * fd;
 	fd=fopen("currentTime.txt","r");
 	char * buffer=NULL;
@@ -23,10 +29,12 @@ void getTime()
 		printf("%s\n",buffer);
 	}
 	fclose(fd);
+	pthread_mutex_unlock(&lock);
 }
 
-void writeTime()
+static void * writeTime(void * attr)
 {
+	pthread_mutex_trylock(&lock);
 	FILE * atime;
 	char* time_file = "currentTime.txt";
 	atime = fopen(time_file,"w");
@@ -36,8 +44,15 @@ void writeTime()
 	int size = 100;
 	char formatTime[size];
 	strftime(formatTime,sizeof(formatTime),"%I:%M%P, %A, %B %d, %G",&tm_clock);
+	if(formatTime[0] == '0')
+	{
+		formatTime[0]=' ';
 	fprintf(atime,"%s",formatTime);
+	}
+	fprintf(atime," %s",formatTime);
 	fclose(atime);
+	pthread_mutex_unlock(&lock);
+	return NULL;
 	
 }
 
@@ -73,6 +88,17 @@ int get_input(struct Room holder[7],char victory[100][100],int current,int * ste
 	{
 		if(strcmp(user_input,"time\n")==0)
 		{
+			pthread_t timeClock;
+			const pthread_attr_t* attr = NULL;
+			void * args = NULL;
+			int threadOne =  pthread_create(&timeClock,
+					NULL,
+					writeTime,
+					args);		
+			pthread_t mainGame;
+			void * gameArgs = NULL;			
+			void * return_value;
+			int i = pthread_join(timeClock,return_value);
 			getTime();
 		}
 		else
@@ -210,67 +236,7 @@ char * find_recent_dir()
 	strcpy(temptr,relevant_dir[most_recent_index]);
 	return temptr;	
 }
-void play_game(struct Room holder[7])
-{
-	int i,c;	
-	int current;
-	char * start = "START_ROOM\n";
-	char * end = "END_ROOM\n";
-	char victory[100][100];
-	int steps=0;
-	int start_index, end_index;
-	for(i=0;i<7;i++)
-	{
-		//	printf("name %s\n",holder[i].name);
-		for(c=0; c<holder[i].num_connections; c++)
-		{
-			//		printf("%s\n",holder[i].connections[c]);
-		}
-		//	printf("type %s\n",holder[i].room_type);
-		//	printf("num %d\n",holder[i].num_connections);
-	}
-	for(i =0; i < 7; i++)
-	{
-		if(strcmp(holder[i].room_type, start)== 0)
-		{
-			start_index = i;
-		}
-		else if(strcmp(holder[i].room_type, end)== 0)
-		{
-			end_index = i;
-		}
-	}	
-	current = start_index;
-	while(current != end_index)
-	{
-		printf("CURRENT LOCATION: %s",holder[current].name);
-		printf("POSSIBLE CONNECTIONS: ");
-		for(i=0;i<holder[current].num_connections - 1;i++)
-		{
-			char temp [15];
-			strcpy(temp, holder[current].connections[i]);
-			temp[strlen(holder[current].connections[i])-1]='\0';
-			printf("%s, ",temp);
-		}
-		char temp [15];
-		int num = holder[current].num_connections - 1;
-		strcpy(temp, holder[current].connections[num]);
-		temp[strlen(holder[current].connections[num])-1]='\0';
-		printf("%s.\n",temp);
-		printf("WHERE TO? >");
-		current = get_input(holder,victory,current,&steps);
-	}
-	printf("\nYOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
-	printf("YOU TOOK %d STEPS. YOUR PATH TO VICTORY WAS:\n",steps);
-	for(i = 0; i < steps-1; i++)
-	{
-		printf("%s",victory[i]);
-	}
-	printf("%s",holder[current].name);
-
-}
-
-int main()
+void play_game()
 {
 	int i,q;
 	struct Room holder[7];
@@ -326,9 +292,62 @@ int main()
 		fclose(fp);
 	}
 	free(buffer);
-	int c;
-	writeTime();
-	play_game(holder);
+
+	int c;	
+	int current;
+	char * start = "START_ROOM\n";
+	char * end = "END_ROOM\n";
+	char victory[100][100];
+	int steps=0;
+	int start_index, end_index;
+	/*for(i=0;i<7;i++)
+	{
+		//	printf("name %s\n",holder[i].name);
+		for(c=0; c<holder[i].num_connections; c++)
+		{
+			//		printf("%s\n",holder[i].connections[c]);
+		}
+		//	printf("type %s\n",holder[i].room_type);
+		//	printf("num %d\n",holder[i].num_connections);
+	}*/
+	for(i =0; i < 7; i++)
+	{
+		if(strcmp(holder[i].room_type, start)== 0)
+		{
+			start_index = i;
+		}
+		else if(strcmp(holder[i].room_type, end)== 0)
+		{
+			end_index = i;
+		}
+	}	
+	current = start_index;
+	while(current != end_index)
+	{
+		printf("CURRENT LOCATION: %s",holder[current].name);
+		printf("POSSIBLE CONNECTIONS: ");
+		for(i=0;i<holder[current].num_connections - 1;i++)
+		{
+			char temp [15];
+			strcpy(temp, holder[current].connections[i]);
+			temp[strlen(holder[current].connections[i])-1]='\0';
+			printf("%s, ",temp);
+		}
+		char temp [15];
+		int num = holder[current].num_connections - 1;
+		strcpy(temp, holder[current].connections[num]);
+		temp[strlen(holder[current].connections[num])-1]='\0';
+		printf("%s.\n",temp);
+		printf("WHERE TO? >");
+		current = get_input(holder,victory,current,&steps);
+	}
+	printf("\nYOU HAVE FOUND THE END ROOM. CONGRATULATIONS!\n");
+	printf("YOU TOOK %d STEPS. YOUR PATH TO VICTORY WAS:\n",steps);
+	for(i = 0; i < steps-1; i++)
+	{
+		printf("%s",victory[i]);
+	}
+	printf("%s",holder[current].name);
 	free(dir);
 	for(i = 0; i< 7; i++)
 	{
@@ -339,4 +358,24 @@ int main()
 		free(holder[i].room_type);
 		free(holder[i].name);
 	}
+}
+
+int main(void)
+{
+	/*pthread_t timeClock;
+	  const pthread_attr_t* attr = NULL;
+	  void * args = NULL;
+	  int threadOne =  pthread_create(&timeClock,
+	  NULL,
+	  writeTime,
+	  args);		
+	  pthread_t mainGame;
+	  void * gameArgs = NULL;	*/		
+	/*	int threadTwo = pthread_create(&mainGame,
+		NULL,
+		play_game,
+		(void *)gameArgs);*/
+
+	//	writeTime();
+	play_game();
 }
